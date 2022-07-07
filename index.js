@@ -25,8 +25,14 @@ async function run() {
             const service = req.body;
             const result = await servicesCollection.insertOne(service);
             console.log(result);
-            res.json(result);
+            res.send(result);
         });
+
+        // get all services
+        app.get('/services', async (req, res) => {
+            const result = await servicesCollection.find({}).toArray();
+            res.send(result);
+        })
 
     }
     finally {
