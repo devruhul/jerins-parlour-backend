@@ -1,4 +1,5 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -19,12 +20,20 @@ async function run() {
         await client.connect();
         const database = client.db("jerins_parlour");
         const servicesCollection = database.collection("services");
+        const bookingsCollection = database.collection("bookings");
 
         // add services to database
         app.post('/services', async (req, res) => {
             const service = req.body;
             const result = await servicesCollection.insertOne(service);
             console.log(result);
+            res.send(result);
+        });
+
+        // get service by id
+        app.get('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await servicesCollection.findOne({ _id: new ObjectId(id) });
             res.send(result);
         });
 
