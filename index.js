@@ -21,6 +21,7 @@ async function run() {
         const database = client.db("jerins_parlour");
         const servicesCollection = database.collection("services");
         const bookingsCollection = database.collection("bookings");
+        const reviewsCollection = database.collection("reviews");
 
         // add services to database
         app.post('/services', async (req, res) => {
@@ -56,7 +57,12 @@ async function run() {
             res.send(result);
         });
 
-
+        // send service reviews
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewsCollection.insertOne(review);
+            res.send(result);
+        });
     }
     finally {
         // await client.close();
