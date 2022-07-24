@@ -48,8 +48,14 @@ async function run() {
             const booking = req.body;
             const result = await bookingsCollection.insertOne(booking);
             res.send(result);
-        }); 
-            
+        });
+
+        // get all bookings from database
+        app.get('/bookings', async (req, res) => {
+            const result = await bookingsCollection.find({}).toArray();
+            res.send(result);
+        });
+
 
     }
     finally {
