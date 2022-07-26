@@ -57,6 +57,22 @@ async function run() {
             res.send(result);
         });
 
+        // // get single booking by id
+        app.get('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await bookingsCollection.findOne({ _id: new ObjectId(id) });
+            console.log(result);
+            res.send(result);
+        });
+
+        // delete bookings by id
+        app.delete('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await bookingsCollection.deleteOne({ _id: new ObjectId(id) });
+            console.log(result);
+            res.send(result);
+        });
+
         // send service reviews
         app.post('/reviews', async (req, res) => {
             const review = req.body;
