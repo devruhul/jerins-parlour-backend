@@ -1,7 +1,7 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const ObjectId = require('mongodb').ObjectId;
 const express = require('express');
 const app = express();
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 require('dotenv').config();
 
@@ -60,9 +60,8 @@ async function run() {
         // // get single booking by id
         app.get('/bookings/:id', async (req, res) => {
             const id = req.params.id;
-            const result = await bookingsCollection.findOne({ _id: new ObjectId(id) });
-            console.log(result);
-            res.send(result);
+            const result = await bookingsCollection.findOne({ _id: ObjectId(id) });
+            res.json(result);
         });
 
         // delete bookings by id
