@@ -64,11 +64,18 @@ async function run() {
             res.json(result);
         });
 
+        // update order status in bookings collection
+        app.put('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            const status = req.body;
+            const result = await bookingsCollection.updateOne({ _id: ObjectId(id) }, { $set: status });
+            res.send(result);
+        });
+
         // delete bookings by id
         app.delete('/bookings/:id', async (req, res) => {
             const id = req.params.id;
             const result = await bookingsCollection.deleteOne({ _id: new ObjectId(id) });
-            console.log(result);
             res.send(result);
         });
 
