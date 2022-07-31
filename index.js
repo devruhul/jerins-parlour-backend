@@ -27,7 +27,6 @@ async function run() {
         app.post('/services', async (req, res) => {
             const service = req.body;
             const result = await servicesCollection.insertOne(service);
-            console.log(result);
             res.send(result);
         });
 
@@ -35,6 +34,13 @@ async function run() {
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const result = await servicesCollection.findOne({ _id: new ObjectId(id) });
+            res.send(result);
+        });
+
+        // delete service by id
+        app.delete('/services/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await servicesCollection.deleteOne({ _id: new ObjectId(id) });
             res.send(result);
         });
 
@@ -60,15 +66,15 @@ async function run() {
         // // get single booking by id
         app.get('/bookings/:id', async (req, res) => {
             const id = req.params.id;
-            const result = await bookingsCollection.findOne({ _id: ObjectId(id) });
-            res.json(result);
+            const result = await bookingsCollection.findOne({ _id: new ObjectId(id) });
+            res.send(result);
         });
 
         // update order status in bookings collection
         app.put('/bookings/:id', async (req, res) => {
             const id = req.params.id;
             const status = req.body;
-            const result = await bookingsCollection.updateOne({ _id: ObjectId(id) }, { $set: status });
+            const result = await bookingsCollection.updateOne({ _id: new ObjectId(id) }, { $set: status });
             res.send(result);
         });
 
@@ -87,7 +93,7 @@ async function run() {
         });
     }
     finally {
-        // await client.close();
+        await client.close();
     }
 }
 run().catch(console.dir);
