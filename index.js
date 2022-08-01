@@ -22,6 +22,7 @@ async function run() {
         const servicesCollection = database.collection("services");
         const bookingsCollection = database.collection("bookings");
         const reviewsCollection = database.collection("reviews");
+        const usersCollection = database.collection("users");
 
         // add services to database
         app.post('/services', async (req, res) => {
@@ -91,6 +92,14 @@ async function run() {
             const result = await reviewsCollection.insertOne(review);
             res.send(result);
         });
+
+        // save users to database
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        });
+
     }
     finally {
         // await client.close();
