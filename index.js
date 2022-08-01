@@ -93,7 +93,7 @@ async function run() {
         });
     }
     finally {
-        await client.close();
+        // await client.close();
     }
 }
 run().catch(console.dir);
