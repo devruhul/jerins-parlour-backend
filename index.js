@@ -8,6 +8,7 @@ require('dotenv').config();
 const port = process.env.PORT || 5000;
 
 // initialize firebase admin
+
 admin.initializeApp({
     credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
@@ -17,7 +18,7 @@ admin.initializeApp({
     databaseURL: process.env.FIREBASE_DATABASE_URL
 });
 
-
+// middleware
 app.use(cors());
 app.use(express.json());
 
@@ -127,8 +128,20 @@ async function run() {
             res.send(result);
         });
 
-         // uodate user if not existed
-         app.put('/users', async (req, res) => {
+        // check if user roll is admin or not
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.role === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        })
+
+        // uodate user if not existed
+        app.put('/users', async (req, res) => {
             const user = req.body;
             const query = { email: user.email };
             const result = await usersCollection.updateOne(query, { $set: user }, { upsert: true });
@@ -137,10 +150,21 @@ async function run() {
 
         // add admin roll to user
         app.put('/users/makeAdmin', verifyToken, async (req, res) => {
-            const user = req.body;
-            const filter = { email: user.email };
-            const result = await usersCollection.updateOne(filter, { $set: { role: 'admin' } });
-            res.json(result);
+            const email = req.body;
+            const requester = req.decodedEmail;
+            if (requester) {
+                const requesterAccount = await usersCollection.findOne({ email: requester });
+                if (requesterAccount.role === 'admin') {
+                    const filter = { email: email };
+                    const updateDoc = { $set: { role: 'admin' } };
+                    const result = await usersCollection.updateOne(filter, updateDoc);
+                    res.json(result);
+                }
+            }
+            else {
+                res.status(403).json({ message: 'you do not have access to make admin' })
+            }
+
         })
 
     }
@@ -149,7 +173,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
 
 app.get('/', (req, res) => {
     res.send('Jerins Parlour');
