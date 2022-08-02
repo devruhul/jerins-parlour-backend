@@ -1,11 +1,22 @@
 const express = require('express');
 const app = express();
+const admin = require("firebase-admin");
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 require('dotenv').config();
-
 const port = process.env.PORT || 5000;
+
+// initialize firebase admin
+admin.initializeApp({
+    credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    }),
+    databaseURL: process.env.FIREBASE_DATABASE_URL
+});
+
 
 app.use(cors());
 app.use(express.json());
@@ -14,6 +25,22 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.6jlv6.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+// Verify token
+async function verifyToken(req, res, next) {
+    if (req.headers?.authorization?.startsWith('Bearer ')) {
+        const idToken = req.headers.authorization.split('Bearer ')[1];
+        try {
+            const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+            req.decodedEmail = decodedIdToken.email;
+        }
+        catch (error) {
+            console.error("Error while verifying token:", error);
+            res.status(403).send("Unauthorized");
+        }
+    }
+    next()
+}
 
 async function run() {
     try {
@@ -99,6 +126,22 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         });
+
+         // uodate user if not existed
+         app.put('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const result = await usersCollection.updateOne(query, { $set: user }, { upsert: true });
+            res.json(result);
+        })
+
+        // add admin roll to user
+        app.put('/users/makeAdmin', verifyToken, async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const result = await usersCollection.updateOne(filter, { $set: { role: 'admin' } });
+            res.json(result);
+        })
 
     }
     finally {
