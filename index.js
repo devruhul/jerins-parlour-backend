@@ -155,12 +155,12 @@ async function run() {
 
         // add admin roll to user
         app.put('/users/makeAdmin', verifyToken, async (req, res) => {
-            const email = req.body;
+            const user = req.body;
             const requester = req.decodedEmail;
             if (requester) {
                 const requesterAccount = await usersCollection.findOne({ email: requester });
                 if (requesterAccount.role === 'admin') {
-                    const filter = { email: email };
+                    const filter = { email: user.email };
                     const updateDoc = { $set: { role: 'admin' } };
                     const result = await usersCollection.updateOne(filter, updateDoc);
                     res.json(result);
@@ -169,9 +169,7 @@ async function run() {
             else {
                 res.status(403).json({ message: 'you do not have access to make admin' })
             }
-
         })
-
     }
     finally {
         // await client.close();
