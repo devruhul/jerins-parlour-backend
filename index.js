@@ -73,8 +73,13 @@ async function run() {
             res.send(result);
         });
 
-        // get all services
+        // get 3 services
         app.get('/services', async (req, res) => {
+            const result = await servicesCollection.find({}).limit(3).toArray();
+            res.send(result);
+        })
+        // get all services
+        app.get('/allServices', async (req, res) => {
             const result = await servicesCollection.find({}).toArray();
             res.send(result);
         })
