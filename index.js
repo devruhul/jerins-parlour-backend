@@ -97,6 +97,13 @@ async function run() {
             res.send(result);
         });
 
+        // get bookings by email
+        app.get('/bookings/:email', async (req, res) => {
+            const email = req.params.email;
+            const result = await bookingsCollection.find({ email: email }).toArray();
+            res.send(result);
+        });
+
         // // get single booking by id
         app.get('/bookings/:id', async (req, res) => {
             const id = req.params.id;
