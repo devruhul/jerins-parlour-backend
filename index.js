@@ -8,7 +8,6 @@ require('dotenv').config();
 const port = process.env.PORT || 5000;
 
 // initialize firebase admin
-
 admin.initializeApp({
     credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
@@ -51,6 +50,7 @@ async function run() {
         const bookingsCollection = database.collection("bookings");
         const reviewsCollection = database.collection("reviews");
         const usersCollection = database.collection("users");
+        const contactCollection = database.collection("contacts");
 
         // add services to database
         app.post('/services', async (req, res) => {
@@ -177,6 +177,14 @@ async function run() {
                 res.status(403).json({ message: 'you do not have access to make admin' })
             }
         })
+
+        // post contact message to database
+        app.post('/contacts', async (req, res) => {
+            const contact = req.body;
+            const result = await contactCollection.insertOne(contact);
+            console.log(result);
+            res.send(result);
+        });
     }
     finally {
         // await client.close();
