@@ -182,7 +182,6 @@ async function run() {
         app.post('/contacts', async (req, res) => {
             const contact = req.body;
             const result = await contactCollection.insertOne(contact);
-            console.log(result);
             res.send(result);
         });
     }
