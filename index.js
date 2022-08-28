@@ -1,10 +1,10 @@
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const admin = require("firebase-admin");
 const express = require('express');
 const app = express();
-const admin = require("firebase-admin");
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
-const cors = require('cors');
 require('dotenv').config();
+const cors = require('cors');
 const port = process.env.PORT || 5000;
 
 // initialize firebase admin
